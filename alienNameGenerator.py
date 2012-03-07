@@ -1,4 +1,5 @@
 # -*- coding:Utf-8 -*-
+VERSION = '0.1'
 ## ----- alienNameGenerator.py -----
 ##
 ##      Alien name transformator
@@ -112,9 +113,10 @@ def Alienize(string):
 
 # main function
 if __name__ == '__main__':
-    inName = raw_input()
+    print 'Welcome in Alien Name Generator ver ', VERSION, '!'
+    inName = raw_input('Please enter your name! > ')
     if len(inName) == 0:
         print 'Next time try to write an actual name...'
     else:   
-        name = Alienize(raw_input())
+        name = Alienize(inName)
         print name
