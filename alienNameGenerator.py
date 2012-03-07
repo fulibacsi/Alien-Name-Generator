@@ -119,4 +119,4 @@ if __name__ == '__main__':
         print 'Next time try to write an actual name...'
     else:   
         name = Alienize(inName)
-        print name
+        print 'Your alien name is > ', name
