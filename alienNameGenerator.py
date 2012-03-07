@@ -1,5 +1,5 @@
 # -*- coding:Utf-8 -*-
-VERSION = '0.1'
+VERSION = '0.2'
 ## ----- alienNameGenerator.py -----
 ##
 ##      Alien name transformator
@@ -24,99 +24,197 @@ VERSION = '0.1'
 
 
 from random import choice
+import data.pyplanets
 
 
-# STEP 1
-# transform umlaut characters to their non-umlaut version
-def umlautTransform(string):
-    """ Turn every character with umlaut to it's non-umlaut version. """
+class Alienize():
+    """ Create and stores the user's alien name. """
     
-    UmlautNonUmlautDict = {u'á':'a', u'é':'e', u'í':'i', u'ó':'o', u'ö':'o', u'ő':'o', u'ú':'u', u'ü':'u', u'ű':'u'}
-    nonUmlaut = ''
     
-    # for every character,
-    for s in string:
-        # if umlaut character, switch it
-        if s in UmlautNonUmlautDict:
-            nonUmlaut += UmlautNonUmlautDict[s]
-        # don't change in other cases
-        else:
-            nonUmlaut += s
-
-    return nonUmlaut
-
-    
-# STEP 2    
-# remove a random character from the name
-def removeRandomChar(string):
-    delChar = choice(range(0, len(string)))
-    return string[:delChar] + string[delChar + 1:]
-
-
-# STEP 3    
-# transform name to alien-name    
-def insertApostropheAndH(string):
-
-    vowel = 'aeiou'
-    numOfVowels = 0
-    vowelPos = []
-    
-    # count the vowels
-    for i, s in enumerate(string):
-        if s in vowel:
-            numOfVowels += 1
-            vowelPos.append(i)    
-            
-    # if there are no vowels in the name:
-    if numOfVowels == 0:
-        # he/she already have a special name...
-        return string.capitalize()
+    def __init__(self, name = None):
+        """ Init the name. """
+        self.name = name
+        self.planet = None
         
-    # if there are only one vowel:        
-    elif numOfVowels == 1:
-        # if it's in the beginning, or in the end, remove it!
-        if vowelPos[0] == 0:            
-            return string[vowelPos[0] + 1:].capitalize()
-        elif vowelPos == len(string) - 1:
-            return string[:vowelPos[0] - 1].capitalize()
-        # if it's somewhere in the middle:
-        else:
-            return string[:vowelPos[0]].capitalize() + '\' h' + string[vowelPos[0]:]
-            
-    # if there are more than one vowel in the name:
-    elif numOfVowels > 1:
-        # pick one randomly
-        modPos = choice(vowelPos)
-        # if it's in the beginning, or in the end, remove it!
-        if modPos == 0:
-            return string[modPos + 1:].capitalize()
-        elif modPos == len(string) - 1:
-            return string[:modPos - 1].capitalize()
-        # if it's somewhere in the middle:
-        else:
-            return string[:modPos].capitalize() + '\' h' + string[modPos:]
+    
+    def getName(self):
+        """ Set the alien name, and a matching planet, then returns it to the user. """
+        # create the name
+        self.alienize()
+        # create the planet
+        self.getPlanet()
+        
+        # return the result
+        return self.name + ' from the planet ' + self.planet
     
 
-# START PROCESS
-# make your name looks like an Alien's name    
-def Alienize(string):
-    names = umlautTransform(string.decode('utf-8').lower()).encode('ascii').split(' ')
-    alienName = []
+# ---------------------------------- Name -----------------------------------
+
     
-    for name in names:
-        alienName.append(insertApostropheAndH(removeRandomChar(name)))
-        alienName.append(' ')        
+    # STEP 1
+    # transform umlaut characters to their non-umlaut version
+    def umlautTransform(self, string):
+        """ Turn every character with umlaut to it's non-umlaut version. """
         
-    return ''.join(alienName)
+        UmlautNonUmlautDict = {u'á':'a', u'é':'e', u'í':'i', u'ó':'o', u'ö':'o', u'ő':'o', u'ú':'u', u'ü':'u', u'ű':'u'}
+        nonUmlaut = ''
+        
+        # for every character,
+        for s in string:
+            # if umlaut character, switch it
+            if s in UmlautNonUmlautDict:
+                nonUmlaut += UmlautNonUmlautDict[s]
+            # don't change in other cases
+            else:
+                nonUmlaut += s
+
+        # return the result.
+        return nonUmlaut
+
+        
+        
+    # STEP 2    
+    # remove a random character from the name
+    def removeRandomChar(self, string):
+        """ Remove a randomly selected char from the string. """
+
+        modifiedString = string
+
+        # remove characters in proportion to the length of the string
+        for i in range(len(modifiedString) / 5):
+            # select the char,
+            delChar = choice(range(0, len(modifiedString)))
+            # and then remove the selected one, and return the result
+            modifiedString = modifiedString[:delChar] + modifiedString[delChar + 1:]
+
+        # return the modified string
+        return modifiedString
+
+
+    # STEP 3    
+    # transform name to alien-name    
+    def insertApostropheAndH(self, string):
+
+        vowel = 'aeiou'
+        numOfVowels = 0
+        vowelPos = []
+        
+        # count the vowels
+        for i, s in enumerate(string):
+            if s in vowel:
+                numOfVowels += 1
+                vowelPos.append(i)    
+                
+        # if there are no vowels in the name:
+        if numOfVowels == 0:
+            # he/she already have a special name...
+            return string.capitalize()
+            
+        # if there are only one vowel:        
+        elif numOfVowels == 1:
+            # if it's in the beginning, or in the end, remove it!
+            if vowelPos[0] == 0:            
+                return string[vowelPos[0] + 1:].capitalize()
+            elif vowelPos == len(string) - 1:
+                return string[:vowelPos[0] - 1].capitalize()
+            # if it's somewhere in the middle:
+            else:
+                return string[:vowelPos[0]].capitalize() + '\'h' + string[vowelPos[0]:]
+                
+        # if there are more than one vowel in the name:
+        elif numOfVowels > 1:
+            # pick one randomly
+            modPos = choice(vowelPos)
+            # if it's in the beginning, or in the end, remove it!
+            if modPos == 0:
+                return string[modPos + 1:].capitalize()
+            elif modPos == len(string) - 1:
+                return string[:modPos - 1].capitalize()
+            # if it's somewhere in the middle:
+            else:
+                return string[:modPos].capitalize() + '\'h' + string[modPos:]
+        
+
+
+    # START PROCESS
+    # make your name looks like an Alien's name    
+    def alienize(self):
+        """ Create the name. """
+        
+        # replace umlaut characters, handles utf-8 encoding, and split the name
+        names = self.umlautTransform(self.name.decode('utf-8').lower()).encode('ascii').split(' ')
+        alienName = []
+        
+        # for every part of the name,
+        for i, name in enumerate(names):
+            # remove a random char, and try to add a 'h to it
+            alienName.append(self.insertApostropheAndH(self.removeRandomChar(name)))
+            # if it's not the last part, add a whitespace
+            if len(names) != 1 and i < len(names):
+                alienName.append(' ')
+        
+        # join the parts
+        self.name = ''.join(alienName)
+
+
+
+# ---------------------------------- Planet -----------------------------------
+
+
+
+    # STEP 1
+    # get a list of planet names.
+    def getAllPlanet(self):
+        # init the Elite based random planet name generator
+        # originally it's part of Ian Bell's txtelite.c 1.2 (and parts of 1.4)
+        # but later implemented in python. I found the solution in
+        # http://automaticromantic.com/static/misc/pytxtelite.txt
+        # but I use Laszló Szathmáry's (jabba.laci@gmail.com) cleaned version
+        # of it.
+        galaxy = data.pyplanets.Galaxy()
+        # go to galaxy #1
+        galaxy.goto_galaxy(1)
+        
+        # return the planets of the selected galaxy
+        return galaxy.planets
+    
+    
+    
+    # START PROCESS
+    # select the best planet name from the existing planet names
+    def getPlanet(self):
+        """ Select the best matching planet for the name. """
+        
+        # get the planets
+        planets = self.getAllPlanet()
+        # select the first planet
+        selectedPlanet = planets[0]
+        
+        # get all the characters from the name
+        selectedName = set(self.name.lower())
+        
+        # get the actual number of matching characters
+        maxima = len(selectedName.intersection(set(selectedPlanet.lower())))
+        
+        # for every planet,
+        for planet in planets:
+            # if it contains more matching character with the user's name
+            if len(selectedName.intersection(set(planet.lower()))) >= maxima:
+                # select the planet name, and update the maximum value
+                maxima = len(selectedName.intersection(set(planet.lower())))
+                selectedPlanet = planet
+
+        # set the selected planet name
+        self.planet = selectedPlanet
 
 
 
 # main function
 if __name__ == '__main__':
-    print 'Welcome in Alien Name Generator ver ', VERSION, '!'
+    print '\n\tWelcome in Alien Name Generator ver ', VERSION, '!\n'
     inName = raw_input('Please enter your name! > ')
     if len(inName) == 0:
         print 'Next time try to write an actual name...'
     else:   
-        name = Alienize(inName)
-        print 'Your alien name is > ', name
+        alienNameGenerator = Alienize(inName)
+        print 'Your alien name is > ', alienNameGenerator.getName()
