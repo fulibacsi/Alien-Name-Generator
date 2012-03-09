@@ -1,5 +1,5 @@
 # -*- coding:Utf-8 -*-
-VERSION = '0.2'
+VERSION = '0.3'
 ## ----- alienNameGenerator.py -----
 ##
 ##      Alien name transformator
@@ -25,6 +25,7 @@ VERSION = '0.2'
 
 from random import choice
 import data.pyplanets
+import collections as col
 
 
 class Alienize():
@@ -180,6 +181,22 @@ class Alienize():
     
     
     
+    def matchingElementsOfMultiSets(self, multi1, multi2):
+        """ Compute the """
+        num = 0
+        
+        for elem in multi1:
+            if elem in multi2:
+                if multi2[elem] >= multi1[elem]:
+                    num += multi1[elem]
+                else:
+                    num += multi2[elem]
+        
+        return num
+    
+    
+    
+    
     # START PROCESS
     # select the best planet name from the existing planet names
     def getPlanet(self):
@@ -188,20 +205,23 @@ class Alienize():
         # get the planets
         planets = self.getAllPlanet()
         # select the first planet
-        selectedPlanet = planets[0]
+        selectedPlanet = col.Counter(planets[0].lower())
         
         # get all the characters from the name
-        selectedName = set(self.name.lower())
+        selectedName = col.Counter(self.name.lower())
         
         # get the actual number of matching characters
-        maxima = len(selectedName.intersection(set(selectedPlanet.lower())))
+        maxima = self.matchingElementsOfMultiSets(selectedName, selectedPlanet) # len(selectedName.intersection(set(selectedPlanet.lower())))
         
         # for every planet,
         for planet in planets:
-            # if it contains more matching character with the user's name
-            if len(selectedName.intersection(set(planet.lower()))) >= maxima:
+            # computes similarity
+            similarity = self.matchingElementsOfMultiSets(selectedName, col.Counter(planet.lower()))
+            
+            # if it's more similar then
+            if similarity >= maxima:
                 # select the planet name, and update the maximum value
-                maxima = len(selectedName.intersection(set(planet.lower())))
+                maxima = similarity
                 selectedPlanet = planet
 
         # set the selected planet name
