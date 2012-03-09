@@ -180,18 +180,20 @@ class Alienize():
         return galaxy.planets
     
     
-    
+    # compute the similarity
     def matchingElementsOfMultiSets(self, multi1, multi2):
-        """ Compute the """
+        """ Compute the number of matching elements of two multisets. """
+        # parameter
         num = 0
         
+        # for every element in the first multiset,
         for elem in multi1:
+            # if we find a matching element in the second,
             if elem in multi2:
-                if multi2[elem] >= multi1[elem]:
-                    num += multi1[elem]
-                else:
-                    num += multi2[elem]
+                # increase the parameter by the smaller number of occurences
+                num += min(multi1[elem], multi2[elem])
         
+        # return the number of matches
         return num
     
     
@@ -205,13 +207,15 @@ class Alienize():
         # get the planets
         planets = self.getAllPlanet()
         # select the first planet
-        selectedPlanet = col.Counter(planets[0].lower())
+        selectedPlanet = planets[0]
         
         # get all the characters from the name
         selectedName = col.Counter(self.name.lower())
         
         # get the actual number of matching characters
-        maxima = self.matchingElementsOfMultiSets(selectedName, selectedPlanet) # len(selectedName.intersection(set(selectedPlanet.lower())))
+        maxima = self.matchingElementsOfMultiSets(selectedName, col.Counter(selectedPlanet.lower())) 
+        # previous solution:
+        # maxima = len(selectedName.intersection(set(selectedPlanet.lower())))
         
         # for every planet,
         for planet in planets:
